@@ -1,0 +1,2 @@
+Configuration:
+	- read patterns from cfg file (instead of python code) @done(2017-01-27)

@@ -13,8 +13,7 @@ import os.path
 import re
 from string import Template
 
-from s3_patterns import s3_patterns, handbook_group_order
-from common import make_pathname, make_title, create_directory
+from common import make_pathname, make_title, create_directory, get_patterns
 
 
 def cmd_slides(args):
@@ -28,8 +27,10 @@ def cmd_slides(args):
         build_deckset_slides(args)
 
 
-def create_source_files_for_slides(args):
+def create_source_files_for_slides(args, s3_patterns):
     """Create dummy source files for slides. If file or folder exists, don't touch it."""
+
+    s3_patterns = get_patterns(args.patterns)[1]
 
     create_directory(args.source)
 
@@ -78,6 +79,8 @@ class DecksetWriter(object):
         self.source = self.args.source
         self.template_path = os.path.join(
             os.path.dirname(self.args.target), 'deckset_template.md')
+        (self.handbook_group_order, self.s3_patterns, _) = get_patterns(args.patterns)
+        
 
     def build(self):
         with codecs.open(self.args.target, 'w+', 'utf-8') as self.target:
@@ -89,12 +92,12 @@ class DecksetWriter(object):
 
                 # insert illustrations for all pattern groups
                 if self.INSERT_ILLUSTRATIONS_FOR_PATTERN_GROUPS:
-                    for i, group in enumerate(handbook_group_order):
+                    for i, group in enumerate(self.handbook_group_order):
                         self.target.write(self.GROUP_INDEX_IMAGE % str(i + 1))
                         self.target.write('\n\n---\n\n')
 
                 # add all the groups
-                for i, group in enumerate(handbook_group_order):
+                for i, group in enumerate(self.handbook_group_order):
                     self.insert_group(group, i + 1)
 
                 # insert closing slides
@@ -104,7 +107,7 @@ class DecksetWriter(object):
     def build_web_markdown(self):
         """Build indivdual markdown files for web publishing."""
         # add all the groups
-        for i, group in enumerate(handbook_group_order):
+        for i, group in enumerate(self.handbook_group_order):
             with codecs.open(os.path.join('web', '%s.md' % group), 'w+', 'utf-8') as self.target:
                 self.insert_group(group, i + 1, False)
 
@@ -140,7 +143,7 @@ class DecksetWriter(object):
             self._copy_markdown(folder, self.GROUP_INDEX_FILENAME)
 
         # add individual patterns
-        for pattern_index, pattern in enumerate(s3_patterns[group]):
+        for pattern_index, pattern in enumerate(self.s3_patterns[group]):
             self._copy_markdown(folder, '%s.md' % make_pathname(
                 pattern), self.PATTERN_NUMBER % (group_index, pattern_index + 1))
 
@@ -180,6 +183,7 @@ class RevealJsWriter(object):
         self.source = self.args.source
         self.template_path = os.path.join(
             os.path.dirname(self.args.target), 'template.html')
+        (self.handbook_group_order, self.s3_patterns, _) = get_patterns(args.patterns)
 
     def build(self):
         with codecs.open(self.args.target, 'w+', 'utf-8') as self.target:
@@ -187,7 +191,7 @@ class RevealJsWriter(object):
 
                 self.copy_template_header()
                 self.insert_title()
-                for group in handbook_group_order:
+                for group in self.handbook_group_order:
                     self.insert_group(group)
                 self.insert_closing()
                 self.copy_template_footer()
@@ -227,7 +231,7 @@ class RevealJsWriter(object):
             self._copy_markdown(folder, 'index.md')
             self._end_slide()
 
-        for pattern in s3_patterns[group]:
+        for pattern in self.s3_patterns[group]:
             self._start_slide()
             self._copy_markdown(folder, '%s.md' % make_pathname(pattern))
             self._end_slide()

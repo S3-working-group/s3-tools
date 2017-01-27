@@ -7,9 +7,6 @@ import re
 import os.path
 import sys
 
-from s3_patterns import s3_patterns, all_patterns, handbook_group_order
-
-from common import make_pathname, make_title, create_directory
 from export_lists import cmd_list
 from slides import cmd_slides
 
@@ -23,8 +20,10 @@ def add_parser_slides(subparsers):
                         help='Build reveal.js presentation.')
     slides.add_argument('--deckset', action='store_true',
                         help='Build deckset presentation.')
-    slides.add_argument('--target', 
+    slides.add_argument('--target', '-t',
                         help='Target file (for reveal.js and deckset builds.')
+    slides.add_argument('patterns', 
+                     help='yaml file with pattern structure')
     slides.add_argument('source', 
                         help='Directory for source files.')
     slides.set_defaults(func=cmd_slides)
@@ -33,10 +32,13 @@ def add_parser_slides(subparsers):
 def add_parser_list(subparsers):
     lst = subparsers.add_parser('list',
                                 help="Export pattern list in various formats.")
+
     lst.add_argument('format', nargs='?', default='list',
                         help='format: list, opml, d3, translation, markdown.')
     lst.add_argument('--language', default='de',
                         help="Language suffix for translation files, e.g. 'de', 'fr'.")
+    lst.add_argument('patterns', 
+                     help='yaml file with pattern structure')
     lst.set_defaults(func=cmd_list)
 
 def main():
