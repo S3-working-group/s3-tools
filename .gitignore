@@ -87,3 +87,5 @@ ENV/
 
 # Rope project settings
 .ropeproject
+/s3tools.sublime-workspace
+/tmp
