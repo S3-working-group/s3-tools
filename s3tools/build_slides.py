@@ -16,6 +16,9 @@ from build_deckset_slides import DecksetWriter
 from build_revealjs_slides import RevealJsWriter
 from build_web_content import cmd_convert_to_web
 
+TMP_FOLDER = 'tmp-groups'
+
+
 def cmd_build_slides(args):
     """Build slides decks"""
 
@@ -33,9 +36,9 @@ def cmd_build_slides(args):
 
 def build_deckset_slides(args):
     """Create a source file for a deckset presentation."""
-    c = PatternGroupCompiler(args)
+    c = PatternGroupCompiler(args, TMP_FOLDER)
     c.compile_pattern_groups()
-    r = DecksetWriter(args)
+    r = DecksetWriter(args, TMP_FOLDER)
     r.build()
 
 
@@ -44,16 +47,16 @@ def build_reveal_slides(args):
     Build reveal.js presentation. <target> is a file inside the reveal.js folder, 
     template.html is expected in the same folder.
     """
-    c = PatternGroupCompiler(args)
+    c = PatternGroupCompiler(args, TMP_FOLDER)
     c.compile_pattern_groups()
-    r = RevealJsWriter(args)
+    r = RevealJsWriter(args, TMP_FOLDER)
     r.build()
 
 
 def build_wordpress(args):
-    c = PatternGroupCompiler(args)
+    c = PatternGroupCompiler(args, TMP_FOLDER)
     c.compile_pattern_groups()
-    cmd_convert_to_web(args)
+    cmd_convert_to_web(args, TMP_FOLDER)
 
 
 def cmd_create_source_files_for_slides(args):
@@ -85,8 +88,6 @@ def cmd_create_source_files_for_slides(args):
 
 
 class PatternGroupCompiler():
-
-    GROUP_PATH = 'tmp-groups'
     
     PATTERN_NUMBER = ' Pattern %s.%s:'
     
@@ -94,11 +95,12 @@ class PatternGroupCompiler():
     GROUP_INDEX_IMAGE = '\n![inline,fit](img/grouped-patterns/group-%s.png)\n\n'    
     GROUP_TITLE_IMAGE = '\n![inline,fit](img/pattern-group-headers/header-group-%s.png)\n\n'
 
-    def __init__(self, args):
+    def __init__(self, args, tmp_folder):
         self.args = args
         self.source = self.args.source
         self.template_path = os.path.join(
             os.path.dirname(self.args.target), 'deckset_template.md')
+        self.temp_folder = tmp_folder
         (self.handbook_group_order, self.s3_patterns, _) = get_patterns(args.patterns)
         self.INSERT_GROUP_TEXT_TITLE_SLIDE = False
         self.INSERT_GROUP_IMG_TITLE_SLIDE = False
@@ -114,11 +116,11 @@ class PatternGroupCompiler():
     def compile_pattern_groups(self):
         """Compile one temp file for each pattern group."""
         
-        if not os.path.exists(self.GROUP_PATH):
-            os.makedirs(self.GROUP_PATH)
+        if not os.path.exists(self.temp_folder):
+            os.makedirs(self.temp_folder)
 
         for i, group in enumerate(self.handbook_group_order):
-            with codecs.open(os.path.join(self.GROUP_PATH, '%s.md' % make_pathname(group)), 'w+', 'utf-8') as self.target:
+            with codecs.open(os.path.join(self.temp_folder, '%s.md' % make_pathname(group)), 'w+', 'utf-8') as self.target:
                 self._insert_group(group, i + 1)
 
 

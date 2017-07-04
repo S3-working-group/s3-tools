@@ -28,14 +28,14 @@ IMG_TEMPLATE = '![](/static-images/{0}'
 # TODO: make output of filename optional
 # TODO: create line writer object with prev_line_empty 
 
-def cmd_convert_to_web(args):
+def cmd_convert_to_web(args, tmp_folder):
     #print "starting conversion"
     
     with codecs.open(args.footer, 'r', 'utf-8') as ft:
         footer=ft.read()
 
     # TODO: add increase headline level as commandline option
-    convert_to_web('tmp-groups', args.target, footer, False)
+    convert_to_web(tmp_folder, args.target, footer, False)
 
 
 def convert_to_web(source, target, footer, increase_headline_level=False):

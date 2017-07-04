@@ -15,13 +15,12 @@ class DecksetWriter(object):
     CONTENT_MARKER = "<!-- INSERT-CONTENT -->"
     GROUP_INDEX_IMAGE = '\n![inline,fit](img/grouped-patterns/group-%s.png)\n\n'
 
-    GROUP_PATH = 'tmp-groups'
-
-    def __init__(self, args):
+    def __init__(self, args, tmp_folder):
         self.args = args
         self.source = self.args.source
         self.template_path = os.path.join(
             os.path.dirname(self.args.target), 'deckset_template.md')
+        self.tmp_folder = tmp_folder
         (self.handbook_group_order, self.s3_patterns, _) = get_patterns(args.patterns)
 
     def build(self):
@@ -41,7 +40,7 @@ class DecksetWriter(object):
 
                 # add all the groups
                 for i, group in enumerate(self.handbook_group_order):
-                    self._copy_markdown(self.GROUP_PATH, '%s.md' % make_pathname(group))
+                    self._copy_markdown(self.tmp_folder, '%s.md' % make_pathname(group))
 
                 # insert closing slides
                 self._copy_markdown(self.source, 'closing.md')
