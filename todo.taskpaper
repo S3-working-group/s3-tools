@@ -1,3 +1,43 @@
-Configuration:
-	- read patterns from cfg file (instead of python code) @done(2017-01-27)
-  - fix reveal.js converter (image display is broken)  
+	Integrate with other repos:
+		s3patterns contains a markdown converter for web
+		s3handbook contains build code for handbook in pdf/epub/web version
+		mdtools contains another reveal converter
+- decide what to merge, and how to do this.  It's probably a good idea to move all that stuff into one repository (mdtools?)
+reveal.js converter:
+	- implement new converter algorithm @estimate(3hrs)
+	- check and fix all specific converter issues
+	 New Deckset File Converter Algorithm:
+		- read file until next slide break or EOF and identify:
+			- slide headline (first headline)
+			- (optional) image
+			- rest of text
+			- remove all duplicate line feeds along the way
+		- if pattern file: prefix headline with pattern number
+		- else: output headline
+		- if image 
+			- if is background image, add to section background
+			- else: add text to div, and then add image to another div and float right
+		- else: output text
+	Specific converter issues:
+		Some or all issues might be gone after new algorithm is implemented
+		- converter does not add pattern numbers and patterns slides
+		- remove '[fit]' from headlines 
+		- images with 'fit' are background images (see https://github.com/hakimel/reveal.js#slide-backgrounds)
+		- text flows over the slide, especially with inline images
+		- sometimes text is truncated (e.g. in slides 'agreement', 'pattern', 'domain' from "all patterns explained")
+		- text does not flow properly around the sides of images and is truncated when browser is full width (e.g. in 'Evaluate Meetings': <h3></h3><p><img float right></p><p>text></p><ul></ul> or "Intended Outcome":  h3 -  p with omg - ul). Apparently <ul> (and <ol>, see "Rounds") does not float left. Simplest way to solve this might be to put all text in one div, and image in another one.
+		- first three slides of "all patterns explained" are broken (due to choices of headline levels etc.)
+Style/Theming:
+	see https://github.com/hakimel/reveal.js/blob/master/css/theme/README.md
+	- check configuration and presentation size
+		https://github.com/hakimel/reveal.js#configuration
+		https://github.com/hakimel/reveal.js#presentation-size
+		
+	- create a new theme (and copy over existing  modifications)
+	- fix remaining style issues (below) in new theme
+	Style Issues:
+		- Headline 1 is too big (and maybe headlines levels are wrong in source material)
+		- text is too big
+		- paragraphs are centered, should be aligned right (.reveal .slides { text-align: center;} 
+		- many slides are truncated (affects text-only slides also). Those slides are displayed completely when reducing the screen width
+		- some slides 
