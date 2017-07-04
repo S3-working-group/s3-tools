@@ -7,8 +7,7 @@ import ConfigParser
 import sys
 import xml.etree.cElementTree as ET
 
-from common import make_title
-from s3_patterns import s3_patterns, all_patterns, handbook_group_order
+from common import make_title, get_patterns
 
 
 def cmd_list(args):
@@ -19,7 +18,10 @@ def cmd_list(args):
         'translation': make_translation_list,
         'translate': translate,
         'markdown': make_md,
-    }    
+    }   
+    (globals()["handbook_group_order"], 
+        globals()["s3_patterns"], 
+        globals()["all_patterns"]) = get_patterns(args.patterns)
     try:
         formats[args.format.lower()](args)
     except KeyError:
