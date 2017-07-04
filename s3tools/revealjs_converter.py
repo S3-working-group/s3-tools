@@ -7,35 +7,7 @@ Convert slides(s) in Deckset Markdown to reveal.js slides.
 import re
 from string import Template
 
-
-
-class LineWriter(object):
-
-    def __init__(self, target, newlines):
-        self.target = target
-        if not newlines:
-            self.newlines = '\n'
-        else:
-            self.newlines = newlines
-        self.prev_line_empty = False
-
-    def write(self, line):
-        """Write line to target, reset blank line counter, output newline if necessary."""
-        if self.prev_line_empty:
-            self.target.write(self.newlines)
-        self.target.write(line.rstrip())
-        self.target.write(self.newlines)
-        self.prev_line_empty = False
-
-    def mark_empty_line(self):
-        self.prev_line_empty = True
-
-
-def increase_headline_level(line):
-    line = '#' + line
-    if line.endswith('#'):
-        line = line + '#'
-    return line
+from common import LineWriter, increase_headline_level
 
 
 SLIDE_START = """

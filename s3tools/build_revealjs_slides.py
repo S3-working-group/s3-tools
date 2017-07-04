@@ -58,6 +58,7 @@ class RevealJsWriter(object):
         self._end_section()
 
     def insert_group(self, group):
+        # TODO: make that operate on compiled group files!!
         folder = os.path.join(self.source, make_pathname(group))
 
         self._start_section()
