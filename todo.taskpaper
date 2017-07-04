@@ -1,8 +1,15 @@
 	Integrate with other repos:
-		s3patterns contains a markdown converter for web
 		s3handbook contains build code for handbook in pdf/epub/web version
-		mdtools contains another reveal converter
-- decide what to merge, and how to do this.  It's probably a good idea to move all that stuff into one repository (mdtools?)
+	- decide what to merge from handbook, and how to do this.  It's probably a good idea to move all that stuff into one repository (mdtools?)
+	- integrate wordpress converter from s3patterns @done(2017-07-04)
+	- integrate wordpress converter from mdtools @done(2017-07-04)
+	- integrate reveal converter from mdtools
+Updated build process:
+	- build files for each pattern group to temp folder (add pattern number to each pattern) @done(2017-07-04)
+	- use these files to build deckset, wordpress and reveal.js @done(2017-07-04)
+	- add configuration options to insert group text title slide, group_img_title_slide and illustrations for pattern groups @done(2017-07-04)
+	- add config option to switch on/off the pattern slides @done(2017-07-04)
+	
 reveal.js converter:
 	- implement new converter algorithm @estimate(3hrs)
 	- check and fix all specific converter issues
