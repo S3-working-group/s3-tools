@@ -8,8 +8,9 @@ import codecs
 import os
 import re
 from string import Template
+import CommonMark
 
-from common import make_pathname, get_patterns, LineWrite
+from common import make_pathname, get_patterns
 
 #from revealjs_converter import convert_to_reveal
 
@@ -48,13 +49,13 @@ class RevealJsWriter(object):
             self.target.write(line)
 
     def insert_title(self):
-        self._copy_markdown(os.path.join(self.source, 'title.md'))
+        self._copy_section(os.path.join(self.source, 'title.md'))
 
     def insert_closing(self):
-        self._copy_markdown(os.path.join(self.source, 'closing.md'))
+        self._copy_section(os.path.join(self.source, 'closing.md'))
 
     def insert_group(self, group):
-        self._copy_markdown(os.path.join(self.tmp_folder, 
+        self._copy_section(os.path.join(self.tmp_folder, 
                                          '%s.md' % make_pathname(group)))
 
     def _start_section(self):
@@ -63,9 +64,7 @@ class RevealJsWriter(object):
     def _end_section(self):
         self.target.write('</section>')
 
-    def _copy_markdown(self, markdown_file):
-        print(markdown_file)
-
+    def _copy_section(self, markdown_file):
         self._start_section()
         with codecs.open(markdown_file, 'r', 'utf-8') as source:
             while True:
@@ -84,7 +83,7 @@ class Slide(object):
     IMG_TEMPLATE = '![](%s)'
     IMG_PATTERN = re.compile("\!\[(.*)\]\((.*)\)")
     FLOATING_IMAGE = Template(
-        """<img class="float-right" src="$url" width="50%" />""")
+        """<div class="float-right"><img src="$url" /></div>\n\n""")
 
     class EndOfFile(Exception):
         pass
@@ -125,38 +124,31 @@ class Slide(object):
         else:
             self.content.append('![](%s)' % image_url)
 
-    def slide_start(self, lw):
+    def slide_start(self, target):
         if self.background_img:
-            lw.write('<section data-markdown data-background-image="%s">' % self.background_img)
+            target.write("""<section data-background-image="%s">\n""" % self.background_img)
         else: 
-            lw.write('<section data-markdown>')
-        lw.write('    <script type="text/template">')
+            target.write("<section>\n")
 
-    def slide_end(self, lw):
-        lw.write('    </script>')
-        lw.write('</section>')
+    def slide_end(self, target):
+        target.write("</section>\n\n")
             
     def render(self, target):
         if self.is_empty:
             return
-        lw = LineWriter(target, None)
 
-        self.slide_start(lw)  
+        self.slide_start(target)  
         if self.headline:
-            lw.write(self.headline)
-            lw.write('')
+            target.write(CommonMark.commonmark(self.headline))
+            target.write("\n")
 
         if self.floating_image:
-            #lw.write('<div class="float-right">')
-            #lw.write('</div>')            
-            #lw.write('<div>')
-            for line in self.content:
-                lw.write(line)
-            #lw.write('</div>')
-            lw.write(self.FLOATING_IMAGE.substitute(url=self.floating_image))
-
+            target.write("""<div class="float-left">\n""")
+            target.write(CommonMark.commonmark("".join(self.content)))
+            target.write('</div>\n')
+            target.write(self.FLOATING_IMAGE.substitute(url=self.floating_image))
 
         else:
-            for line in self.content:
-                lw.write(line)
-        self.slide_end(lw)
+            target.write(CommonMark.commonmark("".join(self.content)))
+            target.write("\n")
+        self.slide_end(target)
