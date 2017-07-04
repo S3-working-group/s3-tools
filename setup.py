@@ -8,6 +8,7 @@ setup(
     entry_points = {
         'console_scripts': [
             's3tools = s3tools.s3tools:main',
+            's3slides = s3tools.s3slides:main',
         ],
     }
 

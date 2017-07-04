@@ -8,25 +8,27 @@ from __future__ import unicode_literals
 
 import codecs
 import os
+import sys
 
 from common import make_pathname, make_title, create_directory, get_patterns
 
-from make_deckset_slides import DecksetWriter
-from make_revealjs_slides import RevealJsWriter
+from build_deckset_slides import DecksetWriter
+from build_revealjs_slides import RevealJsWriter
 
 
-def cmd_slides(args):
+def cmd_build_slides(args):
     """Build slides decks"""
 
-    if args.skeleton:
-        create_source_files_for_slides(args)
-    if args.reveal:
+    if args.format == 'revealjs':
         build_reveal_slides(args)
-    if args.deckset:
+
+    elif args.format == 'deckset':
         build_deckset_slides(args)
+    else:
+        print("unknown format", args.format)
+        sys.exit(1)
 
-
-def create_source_files_for_slides(args, s3_patterns):
+def cmd_create_source_files_for_slides(args):
     """Create dummy source files for slides. If file or folder exists, don't touch it."""
 
     s3_patterns = get_patterns(args.patterns)[1]

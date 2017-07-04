@@ -1,33 +1,8 @@
 #!/usr/bin/env python
 
 import argparse
-import os
-import shutil
-import re
-import os.path
-import sys
 
 from export_lists import cmd_list
-from make_s3_pattern_slides import cmd_slides
-
-
-def add_parser_slides(subparsers):
-    slides = subparsers.add_parser('slides',
-                                   help="Build slide deck.")
-    slides.add_argument('--skeleton', action='store_true',
-                        help='Build skeleton directories and files for slides.')
-    slides.add_argument('--reveal', action='store_true',
-                        help='Build reveal.js presentation.')
-    slides.add_argument('--deckset', action='store_true',
-                        help='Build deckset presentation.')
-    slides.add_argument('--target', '-t',
-                        help='Target file (for reveal.js and deckset builds.')
-    slides.add_argument('patterns', 
-                     help='yaml file with pattern structure')
-    slides.add_argument('source', 
-                        help='Directory for source files.')
-    slides.set_defaults(func=cmd_slides)
-
 
 def add_parser_list(subparsers):
     lst = subparsers.add_parser('list',
@@ -49,7 +24,6 @@ def main():
     parser.add_argument('--verbose', '-v', action='count')
     subparsers = parser.add_subparsers()
 
-    add_parser_slides(subparsers)
     add_parser_list(subparsers)
 
     args = parser.parse_args()
