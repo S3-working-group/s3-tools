@@ -8,7 +8,7 @@ import os.path
 import sys
 
 from export_lists import cmd_list
-from slides import cmd_slides
+from make_s3_pattern_slides import cmd_slides
 
 
 def add_parser_slides(subparsers):
