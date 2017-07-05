@@ -22,7 +22,7 @@ class RevealJsWriter(object):
         self.args = args
         self.source = self.args.source
         self.template_path = os.path.join(
-            os.path.dirname(self.args.target), 'template.html')
+            os.path.dirname(self.args.target), '..', 'templates', 'revealjs-template.html')
         self.tmp_folder = tmp_folder
         (self.handbook_group_order, self.s3_patterns, _) = get_patterns(args.patterns)
 
@@ -81,7 +81,9 @@ class RevealJsWriter(object):
 class Slide(object):
 
     IMG_TEMPLATE = '![](%s)'
-    IMG_PATTERN = re.compile("\!\[(.*)\]\((.*)\)")
+    IMG_PATTERN = re.compile("\!\[(?P<format>.*)\]\((?P<url>.*)\)")
+    HEADLINE_PATTERN = re.compile("^(?P<level>#+)(?: ?(?:\[fit\])? ?)(?P<text>.*)$")
+    HEADLINE = Template("$level $text\n")
     FLOATING_IMAGE = Template(
         """<div class="float-right"><img src="$url" /></div>\n\n""")
 
@@ -102,8 +104,12 @@ class Slide(object):
             l = line.strip()
             if l.strip() == '---':
                 return
-            elif l.startswith('#') and not self.headline:
-                self.headline = l
+            elif l.startswith('#'):
+                headline = self.process_headline(l)
+                if not self.headline:
+                    self.headline = headline
+                else:
+                    self.content.append(headline)
             elif l.startswith("![") and l.endswith(')'):
                 #process image
                 self.process_image(l)
@@ -116,13 +122,18 @@ class Slide(object):
         """Identify background and floating images, add all others to content.."""
         # TODO: convert background images (needs two pass and buffer)
         m = self.IMG_PATTERN.match(line)
-        format, image_url = (m.group(1).lower(), m.group(2))
+        format, image_url = (m.group('format').lower(), m.group('url'))
         if 'right' in format:
             self.floating_image = image_url
         elif format == 'fit':
             self.background_img = image_url
         else:
             self.content.append('![](%s)' % image_url)
+
+    def process_headline(self, headline):
+        """Remove [fit] from headline."""
+        m = self.HEADLINE_PATTERN.match(headline)
+        return self.HEADLINE.substitute(level=m.group('level'), text=m.group('text'))
 
     def slide_start(self, target):
         if self.background_img:

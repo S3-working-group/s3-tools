@@ -99,7 +99,7 @@ class PatternGroupCompiler():
         self.args = args
         self.source = self.args.source
         self.template_path = os.path.join(
-            os.path.dirname(self.args.target), 'deckset_template.md')
+            os.path.dirname(self.args.target), 'templates', 'deckset-template.md')
         self.temp_folder = tmp_folder
         (self.handbook_group_order, self.s3_patterns, _) = get_patterns(args.patterns)
         self.INSERT_GROUP_TEXT_TITLE_SLIDE = False

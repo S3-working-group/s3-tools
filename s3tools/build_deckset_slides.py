@@ -19,7 +19,7 @@ class DecksetWriter(object):
         self.args = args
         self.source = self.args.source
         self.template_path = os.path.join(
-            os.path.dirname(self.args.target), 'deckset_template.md')
+            os.path.dirname(self.args.target), 'templates', 'deckset-template.md')
         self.tmp_folder = tmp_folder
         (self.handbook_group_order, self.s3_patterns, _) = get_patterns(args.patterns)
 
