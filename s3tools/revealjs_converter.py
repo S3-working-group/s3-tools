@@ -17,7 +17,7 @@ class RevealJSMarkdownConverter(object):
     Convert Deckset Markdown to Reveal.js Markdown slides.
 
     Untested. Has known issues with image placement and other things. 
-    Migth still be helpful sometime.
+    Might still be helpful sometime because the new converter can only output HTML.
     """
     SLIDE_START = """
     <section data-markdown>

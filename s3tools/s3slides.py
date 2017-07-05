@@ -7,14 +7,14 @@ import re
 import os.path
 import sys
 
-from build_slides import cmd_build_slides, cmd_create_source_files_for_slides
-from convert_slides import cmd_convert_slides
+from build_slides import cmd_build_slides, cmd_create_source_files_for_slides, cmd_convert_slides
+
 
 def add_parser_build(subparsers):
     sp = subparsers.add_parser('build',
                                help="Build a slide deck.")
     sp.add_argument('format', help="presentation format, either 'deckset', 'wordpress' or 'revealjs'.")
-    sp.add_argument('config', help='yaml file with presenation structure')
+    sp.add_argument('config', help='yaml file with presentation structure')
     sp.add_argument('source', help='Directory with source files.')
     sp.add_argument('target', help='Target file (for reveal.js and deckset) or folder (for wordpress).')
     sp.add_argument('--footer', help='The footer to add to each group (wordpress output)')
@@ -38,8 +38,8 @@ def add_parser_convert(subparsers):
 def add_parser_skeleton(subparsers):
     sp = subparsers.add_parser('skeleton',
                                help="Create skeleton directories and files for slides.")
-    sp.add_argument('patterns', help='yaml file with pattern structure')
-    sp.add_argument('source', help='Directory with source files.')
+    sp.add_argument('config', help='yaml file with presentation structure')
+    sp.add_argument('source', help='Directory for source files.')
     sp.set_defaults(func=cmd_create_source_files_for_slides)
 
 

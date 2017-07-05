@@ -14,10 +14,9 @@ from shutil import copyfile
 from common import make_pathname, make_title, create_directory, read_config
 
 from build_deckset_slides import DecksetWriter
-from build_revealjs_slides import RevealJsWriter
+from build_revealjs_slides import RevealJsWriter, RevealJSBuilder
 from build_web_content import cmd_convert_to_web
-
-
+from revealjs_converter import RevealJsHtmlConverter
 
 TMP_FOLDER = 'tmp-groups'
 
@@ -37,6 +36,14 @@ def cmd_build_slides(args):
         sys.exit(1)
 
 
+def cmd_convert_slides(args):
+    """Converta file in deckset format to a reveal.js presentation (html)."""
+
+    cw = RevealJsHtmlConverter(args.source)
+    rw = RevealJsWriter(args.target, args.template, cw)
+    rw.build()
+
+
 def build_deckset_slides(args):
     """Create a source file for a deckset presentation."""
     c = SectionCompiler(args, TMP_FOLDER)
@@ -52,8 +59,10 @@ def build_reveal_slides(args):
     """
     c = SectionCompiler(args, TMP_FOLDER)
     c.compile_content()
-    r = RevealJsWriter(args, TMP_FOLDER)
-    r.build()
+
+    cw = RevealJSBuilder(args.config, TMP_FOLDER)
+    rw = RevealJsWriter(args.target, args.template, cw)
+    rw.build()
 
 
 def build_wordpress(args):

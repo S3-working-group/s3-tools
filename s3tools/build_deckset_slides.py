@@ -26,9 +26,9 @@ class DecksetWriter(object):
             with codecs.open(self.template_path, 'r', 'utf-8') as self.template:
 
                 self._copy_template_header()
-                self._append_section(self.tmp_folder, 'title.md')
+                self._append_section('title.md')
                 if self.config.has_key('introduction'):
-                    self._append_section(self.tmp_folder, 'introduction.md')
+                    self._append_section('introduction.md')
                 
                 # insert illustrations for all chapters between intro and chapters
                 if self.args.add_chapter_illustration:
@@ -38,11 +38,11 @@ class DecksetWriter(object):
 
                 # add all the groups
                 for i, chapter in enumerate(self.config['chapter_order']):
-                    self._append_section(self.tmp_folder, '%s.md' % make_pathname(chapter))
+                    self._append_section('%s.md' % make_pathname(chapter))
 
                 if self.config.has_key('closing'):
-                    self._append_section(self.tmp_folder, 'closing.md')
-                self._append_section(self.tmp_folder, 'end.md', skip_section_break=True)
+                    self._append_section('closing.md')
+                self._append_section('end.md', skip_section_break=True)
 
                 self._copy_template_footer()
 
@@ -57,8 +57,8 @@ class DecksetWriter(object):
         for line in self.template:
             self.target.write(line)
 
-    def _append_section(self, folder, name, skip_section_break=False):
-        with codecs.open(os.path.join(folder, name), 'r', 'utf-8') as section:
+    def _append_section(self, name, skip_section_break=False):
+        with codecs.open(os.path.join(self.tmp_folder, name), 'r', 'utf-8') as section:
             for line in section:
                 self.target.write(line)
         if not skip_section_break:

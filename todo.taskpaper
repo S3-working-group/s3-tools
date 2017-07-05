@@ -4,14 +4,16 @@ Make a generic deck builder:
 		- read introduction and closing (if present) form yaml @done(2017-07-05)
 		- rename patterns and groups to chapters and sections @done(2017-07-05)
 		- should configuration (numbering, headlines etc go to yaml?
-		- should minimal reveal.js be added to this repo?
 		- should templates also live in this repo?
 		- rename patterns to config @done(2017-07-05)
 		- fix cmd to build decks: add title, intro, closing and end @done(2017-07-05)
 		- fix skeleton writer!!
 		- to describe --add-chapter-illustration @done(2017-07-05)
 		- add CHAPTER_NUMBER, CHAPTER_INDEX_FILENAME, CHAPTER_INDEX_IMAGE, CHAPTER_TITLE_IMAGE  to config 
-		- fix reveal.js converter
+		- fix reveal.js converter @done(2017-07-05)
+		- fix wordpress builder
+		- remove empty slide at end of each section in reveal.js
+		- add minimal reveal.js to repo
 	
 Create a reveal.js converter for full presentations:
 	- move slide converter to a new file @done(2017-07-05)
