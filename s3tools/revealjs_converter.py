@@ -7,9 +7,7 @@ import codecs
 import re
 from string import Template
 
-import CommonMark
-
-from common import LineWriter, increase_headline_level
+from common import LineWriter, increase_headline_level, markdown2html
 
 
 class RevealJSMarkdownConverter(object):
@@ -99,6 +97,7 @@ class Slide(object):
         self.headline = None
         self.background_img = None
         self.content = []
+        self.speaker_notes = []
         self.floating_image = None
         self.is_empty = True
 
@@ -107,8 +106,8 @@ class Slide(object):
         for line in source:
             self.is_empty = False
             l = line.strip()
-            if l.strip() == '---':
-                return
+            if l == '---':
+                return # slide end
             elif l.startswith('#'):
                 headline = self.process_headline(l)
                 if not self.headline:
@@ -118,6 +117,8 @@ class Slide(object):
             elif l.startswith("![") and l.endswith(')'):
                 #process image
                 self.process_image(l)
+            elif l.startswith('^'):
+                self.speaker_notes.append(line[1:])
             else:
                 self.content.append(line)
         else:
@@ -155,16 +156,22 @@ class Slide(object):
 
         self.slide_start(target)  
         if self.headline:
-            target.write(CommonMark.commonmark(self.headline))
+            target.write(markdown2html(self.headline))
             target.write("\n")
 
         if self.floating_image:
             target.write("""<div class="float-left">\n""")
-            target.write(CommonMark.commonmark("".join(self.content)))
+            target.write(markdown2html("".join(self.content)))
             target.write('</div>\n')
             target.write(self.FLOATING_IMAGE.substitute(url=self.floating_image))
 
         else:
-            target.write(CommonMark.commonmark("".join(self.content)))
+            target.write(markdown2html("".join(self.content)))
             target.write("\n")
+
+        if self.speaker_notes:
+            target.write("""<aside class="notes">\n""")
+            target.write(markdown2html("".join(self.speaker_notes)))
+            target.write('</aside>')
+
         self.slide_end(target)

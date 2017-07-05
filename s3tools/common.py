@@ -2,7 +2,7 @@
 
 import os
 import yaml
-
+import markdown
 
 def make_pathname(name):
     return name.lower().replace(" ", '-')
@@ -27,6 +27,10 @@ def increase_headline_level(line):
     if line.endswith('#'):
         line = line + '#'
     return line
+
+
+def markdown2html(text):
+    return markdown.markdown(text,['markdown.extensions.extra', 'markdown.extensions.meta'])
 
 
 class LineWriter(object):
