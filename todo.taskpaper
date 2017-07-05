@@ -1,13 +1,17 @@
 Make a generic deck builder:
 	 - read full presentation structure from yaml
-		- read name of title and end slides
-		- read introduction and closing (if present) form yaml
-		- rename patterns and groups to chapters and sections
+		- read name of title and end slides @done(2017-07-05)
+		- read introduction and closing (if present) form yaml @done(2017-07-05)
+		- rename patterns and groups to chapters and sections @done(2017-07-05)
 		- should configuration (numbering, headlines etc go to yaml?
 		- should minimal reveal.js be added to this repo?
 		- should templates also live in this repo?
-		- rename patterns to config
-		- fix cmd to build decks: add title, intro, closing and end
+		- rename patterns to config @done(2017-07-05)
+		- fix cmd to build decks: add title, intro, closing and end @done(2017-07-05)
+		- fix skeleton writer!!
+		- to describe --add-chapter-illustration @done(2017-07-05)
+		- add CHAPTER_NUMBER, CHAPTER_INDEX_FILENAME, CHAPTER_INDEX_IMAGE, CHAPTER_TITLE_IMAGE  to config 
+		- fix reveal.js converter
 	
 Create a reveal.js converter for full presentations:
 	- move slide converter to a new file @done(2017-07-05)

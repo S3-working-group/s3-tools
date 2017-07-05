@@ -9,12 +9,15 @@ from __future__ import unicode_literals
 import codecs
 import os
 import sys
+from shutil import copyfile
 
-from common import make_pathname, make_title, create_directory, get_patterns
+from common import make_pathname, make_title, create_directory, read_config
 
 from build_deckset_slides import DecksetWriter
 from build_revealjs_slides import RevealJsWriter
 from build_web_content import cmd_convert_to_web
+
+
 
 TMP_FOLDER = 'tmp-groups'
 
@@ -36,8 +39,8 @@ def cmd_build_slides(args):
 
 def build_deckset_slides(args):
     """Create a source file for a deckset presentation."""
-    c = PatternGroupCompiler(args, TMP_FOLDER)
-    c.compile_pattern_groups()
+    c = SectionCompiler(args, TMP_FOLDER)
+    c.compile_content()
     r = DecksetWriter(args, TMP_FOLDER)
     r.build()
 
@@ -47,15 +50,15 @@ def build_reveal_slides(args):
     Build reveal.js presentation. <target> is a file inside the reveal.js folder, 
     template.html is expected in the same folder.
     """
-    c = PatternGroupCompiler(args, TMP_FOLDER)
-    c.compile_pattern_groups()
+    c = SectionCompiler(args, TMP_FOLDER)
+    c.compile_content()
     r = RevealJsWriter(args, TMP_FOLDER)
     r.build()
 
 
 def build_wordpress(args):
-    c = PatternGroupCompiler(args, TMP_FOLDER)
-    c.compile_pattern_groups()
+    c = SectionCompiler(args, TMP_FOLDER)
+    c.compile_content()
     cmd_convert_to_web(args, TMP_FOLDER)
 
 
@@ -87,67 +90,112 @@ def cmd_create_source_files_for_slides(args):
             make_file(group_root, pattern, pattern, '##')
 
 
-class PatternGroupCompiler():
-    
-    PATTERN_NUMBER = ' Pattern %s.%s:'
+class SectionCompiler():
+    """Compile all source files relevant for building the slide deck:
+        - title
+        - introduction
+        - all chapters
+        - closing
+        - end
+        into the temp folder.
+
+    Chapters can optionally be prefixed with a title slide, an image slide, or both."""
+
+    # TODO: add those as defaults, and read from config    
+    CHAPTER_NUMBER = ' Pattern %s.%s:'
     
     GROUP_INDEX_FILENAME = 'index.md'
-    GROUP_INDEX_IMAGE = '\n![inline,fit](img/grouped-patterns/group-%s.png)\n\n'    
-    GROUP_TITLE_IMAGE = '\n![inline,fit](img/pattern-group-headers/header-group-%s.png)\n\n'
+    CHAPTER_INDEX_IMAGE = '\n![inline,fit](img/grouped-patterns/group-%s.png)\n\n'    
+    CHAPTER_TITLE_IMAGE = '\n![inline,fit](img/pattern-group-headers/header-group-%s.png)\n\n'
 
     def __init__(self, args, tmp_folder):
         self.args = args
         self.source = self.args.source
-        self.template_path = os.path.join(
-            os.path.dirname(self.args.target), 'templates', 'deckset-template.md')
         self.temp_folder = tmp_folder
-        (self.handbook_group_order, self.s3_patterns, _) = get_patterns(args.patterns)
-        self.INSERT_GROUP_TEXT_TITLE_SLIDE = False
-        self.INSERT_GROUP_IMG_TITLE_SLIDE = False
-        if self.args.group_title == 'img':
-            self.INSERT_GROUP_IMG_TITLE_SLIDE = True
-        elif self.args.group_title == 'text':
-            self.INSERT_GROUP_TEXT_TITLE_SLIDE = True
-        elif self.args.group_title == 'both':
-            self.INSERT_GROUP_IMG_TITLE_SLIDE = True
-            self.INSERT_GROUP_TEXT_TITLE_SLIDE = True
+
+        self.INSERT_CHAPTER_TEXT_TITLE_SLIDE = False
+        self.INSERT_CHAPTER_IMG_TITLE_SLIDE = False
+        if self.args.chapter_title == 'img':
+            self.INSERT_CHAPTER_IMG_TITLE_SLIDE = True
+        elif self.args.chapter_title == 'text':
+            self.INSERT_CHAPTER_TEXT_TITLE_SLIDE = True
+        elif self.args.chapter_title == 'both':
+            self.INSERT_CHAPTER_IMG_TITLE_SLIDE = True
+            self.INSERT_CHAPTER_TEXT_TITLE_SLIDE = True
+        self.config = read_config(self.args.config)
 
 
-    def compile_pattern_groups(self):
-        """Compile one temp file for each pattern group."""
+    def compile_content(self):
+        """Compile one all source files relevant for building the slide deck:
+            - title
+            - introduction
+            - all chapters
+            - closing
+            - end
+            into the temp folder."""
         
         if not os.path.exists(self.temp_folder):
             os.makedirs(self.temp_folder)
 
-        for i, group in enumerate(self.handbook_group_order):
-            with codecs.open(os.path.join(self.temp_folder, '%s.md' % make_pathname(group)), 'w+', 'utf-8') as self.target:
-                self._insert_group(group, i + 1)
+        # title
+        self._copy_file('title.md')
+        # intro 
+        if self.config.has_key('introduction'):
+            self._compile_section_group(self.config['introduction'], 'introduction')
+        # chapters
+        for i, chapter in enumerate(self.config['chapter_order']):
+                self._compile_section_group(self.config['chapters'][chapter], chapter, i + 1)
+        # closing
+        if self.config.has_key('closing'):
+            self._compile_section_group(self.config['closing'], 'closing')
+        # end
+        self._copy_file('end.md')
 
+    def _copy_file(self, name):
+        copyfile(os.path.join(self.source, name), os.path.join(self.temp_folder, name))
 
-    def _insert_group(self, group, group_index):
-        """Build group index and pattern slides."""
-        folder = os.path.join(self.source, make_pathname(group))
+    def _compile_section_group(self, group, group_name, chapter_index=None):
+        """Compile intros, chapters and closing."""
+        folder = os.path.join(self.source, make_pathname(group_name))
+        def is_chapter():
+            return chapter_index
 
-        # group title and index slides
-        if self.INSERT_GROUP_TEXT_TITLE_SLIDE:
-            self.target.write('\n# %s. %s \n\n---\n\n' % (group_index, make_title(group)))
-        if self.INSERT_GROUP_IMG_TITLE_SLIDE:
-            self.target.write(self.GROUP_TITLE_IMAGE % str(group_index))
-            self.target.write('\n\n---\n\n')
-        if self.args.add_group_illustration:
-            self.target.write(self.GROUP_INDEX_IMAGE % str(group_index))
-            self.target.write('\n\n---\n\n')
+        with codecs.open(os.path.join(self.temp_folder, '%s.md' % make_pathname(group_name)), 'w+', 'utf-8') as self.target:
+            if is_chapter():
+                # chapter title and index slides
+                if self.INSERT_CHAPTER_TEXT_TITLE_SLIDE:
+                    self.target.write('\n# %s. %s' % (chapter_index, make_title(group_name)))
+                    self._slide_break()
+                if self.INSERT_CHAPTER_IMG_TITLE_SLIDE:
+                    self.target.write(self.CHAPTER_TITLE_IMAGE % str(chapter_index))
+                    self._slide_break()
+                if self.args.add_chapter_illustration:
+                    self.target.write(self.CHAPTER_INDEX_IMAGE % str(chapter_index))
+                    self._slide_break()
 
-        # insert group preamble if present
-        if os.path.exists(os.path.join(folder, self.GROUP_INDEX_FILENAME)):
-            self._copy_markdown(folder, self.GROUP_INDEX_FILENAME)
+            # insert group preamble if present
+            if os.path.exists(os.path.join(folder, self.GROUP_INDEX_FILENAME)):
+                self._append_section(folder, self.GROUP_INDEX_FILENAME)
+                self._slide_break()
 
-        # add individual patterns
-        for pattern_index, pattern in enumerate(self.s3_patterns[group]):
-            self._copy_markdown(folder, '%s.md' % make_pathname(
-                pattern), self.PATTERN_NUMBER % (group_index, pattern_index + 1))
+            # add individual sections
+            for section_index, section in enumerate(group):
+                if is_chapter():
+                    number = self.CHAPTER_NUMBER % (chapter_index, section_index + 1)
+                else: 
+                    number = None
+                self._append_section(folder, '%s.md' % make_pathname(section), number)
+                if section_index + 1 < len(group):
+                    self._slide_break()
 
-    def _copy_markdown(self, folder, name, headline_prefix=''):
+    def _slide_break(self):
+        self.target.write('\n\n---\n\n')
+
+    def _append_section(self, folder, name, headline_prefix=None):
+        """
+        Append a section to self.target, if headline prefix is given,
+        add that to the first headline of the section.
+        """
         with codecs.open(os.path.join(folder, name), 'r', 'utf-8') as section:
             if headline_prefix:
                 # insert patter number into first headline of file
@@ -161,4 +209,3 @@ class PatternGroupCompiler():
                     ''.join((line[:pos + 1], headline_prefix, line[pos + 1:])))
             for line in section:
                 self.target.write(line)
-        self.target.write('\n\n---\n\n')

@@ -32,3 +32,7 @@ Sections are then organized into chapters. Content for a chapter is pulled from 
 A YAML file describes the order of chapters, and what sections will be included in what chapter. 
 
 Also, an title slides and closing slides can be compiled from sections kept in the 'introduction' and 'closing' folders, also described through the YAML file.
+
+Each chapter may have an `index.md` as a preamble, title slides as text or image (or both) can be generated for each chapter with commandline options.
+
+Between introduction and chapters a set of illustrations for each chapter can be added (used for showing all patterns in groups in "S3- All Patterns Explained", probably less useful in other slide decks.)
