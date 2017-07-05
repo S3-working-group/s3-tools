@@ -7,7 +7,7 @@ import ConfigParser
 import sys
 import xml.etree.cElementTree as ET
 
-from common import make_title, get_patterns
+from common import make_title, read_config
 
 
 def cmd_list(args):
@@ -19,13 +19,25 @@ def cmd_list(args):
         'translate': translate,
         'markdown': make_md,
     }   
-    (globals()["handbook_group_order"], 
-        globals()["s3_patterns"], 
-        globals()["all_patterns"]) = get_patterns(args.patterns)
+    config = read_config(args.config)
+
+    globals()["handbook_group_order"] = config['chapter_order']
+    globals()["s3_patterns"] = config['chapters']
+    globals()["all_patterns"] = get_all_patterns(config)
     try:
         formats[args.format.lower()](args)
     except KeyError:
         raise Exception('unknown format', args.format)
+
+
+def get_all_patterns(config):
+    """Return a sorted list of all s3 pattern (stored in config as "chapters")."""
+    all_patterns = []
+    for group in config['chapters'].keys():
+        for pattern in config['chapters'][group]:
+            all_patterns.append(pattern)
+    print(repr(all_patterns))
+    return sorted(all_patterns)
 
 
 def make_opml(args):

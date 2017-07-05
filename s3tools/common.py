@@ -22,22 +22,6 @@ def read_config(filename):
 	return yaml.load(stream)
 
 
-# def get_patterns(filename):
-# 	"""Return (handbook_group_order, s3_patterns, all_patterns)"""
-# 	data = read_config(filename)
-# 	s3_patterns = data['s3_patterns']
-# 	return (data['handbook_group_order'], s3_patterns, get_all_patterns(s3_patterns))
-
-
-def get_all_patterns(config):
-    """Return a sorted list of all s3 pattern (stored in config as "chapters")."""
-    all_patterns = []
-    for group in config['chapters'].keys():
-        for pattern in s3_patterns[group]:
-            all_patterns.append(pattern)
-    return sorted(all_patterns)
-
-
 def increase_headline_level(line):
     line = '#' + line
     if line.endswith('#'):

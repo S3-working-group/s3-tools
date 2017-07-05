@@ -10,7 +10,7 @@ def add_parser_list(subparsers):
 
     lst.add_argument('format', nargs='?', default='list',
                         help='format: list, opml, d3, translation, markdown.')
-    lst.add_argument('patterns', 
+    lst.add_argument('config', 
                      help='yaml file with pattern structure')
     lst.add_argument('--language', default='de',
                         help="Language suffix for translation files, e.g. 'de', 'fr'.")

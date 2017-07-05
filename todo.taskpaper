@@ -1,45 +1,40 @@
 Make a generic deck builder:
 	 - read full presentation structure from yaml
-		- read name of title and end slides @done(2017-07-05)
-		- read introduction and closing (if present) form yaml @done(2017-07-05)
-		- rename patterns and groups to chapters and sections @done(2017-07-05)
 		- should configuration (numbering, headlines etc go to yaml?
 		- should templates also live in this repo?
-		- rename patterns to config @done(2017-07-05)
-		- fix cmd to build decks: add title, intro, closing and end @done(2017-07-05)
 		- fix skeleton writer!!
-		- to describe --add-chapter-illustration @done(2017-07-05)
 		- add CHAPTER_NUMBER, CHAPTER_INDEX_FILENAME, CHAPTER_INDEX_IMAGE, CHAPTER_TITLE_IMAGE  to config 
-		- fix reveal.js converter @done(2017-07-05)
-		- fix wordpress builder
 		- remove empty slide at end of each section in reveal.js
 		- add minimal reveal.js to repo
-	
-Create a reveal.js converter for full presentations:
-	- move slide converter to a new file @done(2017-07-05)
-	- add commandline wrapper @done(2017-07-05)
-	- make template a command line  parameter @done(2017-07-05)
-	- update build scripts
-	- 
-	- convert to reveal: @done(2017-07-05)
-		- open template @done(2017-07-05)
-		- read preamble @done(2017-07-05)
-		- insert converted file @done(2017-07-05)
-		- write end @done(2017-07-05)
-	- create an object with a write method that writes to target @done(2017-07-05)
-		- RevealJSConverter(source, target) @done(2017-07-05)
-		- RevealJSBuilder(YAML, target) @done(2017-07-05)
 Integrate with other repos:
 	s3handbook contains build code for handbook in pdf/epub/web version
 - decide what to merge from handbook, and how to do this.  It's probably a good idea to move all that stuff into one repository (mdtools?)
 - integrate reveal converter from mdtools
-
 Style/Theming:
 	see https://github.com/hakimel/reveal.js/blob/master/css/theme/README.md
 	- paragraphs are centered, should be aligned right (.reveal .slides { text-align: center;} 
 	- some slides are truncated (affects text-only slides also). Those slides are displayed completely when reducing the screen width
-
 Archive:
+	- read name of title and end slides @done(2017-07-05) @project(Make a generic deck builder)
+	- read introduction and closing (if present) form yaml @done(2017-07-05) @project(Make a generic deck builder)
+	- rename patterns and groups to chapters and sections @done(2017-07-05) @project(Make a generic deck builder)
+	- rename patterns to config @done(2017-07-05) @project(Make a generic deck builder)
+	- fix cmd to build decks: add title, intro, closing and end @done(2017-07-05) @project(Make a generic deck builder)
+	- to describe --add-chapter-illustration @done(2017-07-05) @project(Make a generic deck builder)
+	- fix reveal.js converter @done(2017-07-05) @project(Make a generic deck builder)
+	- fix wordpress builder @done(2017-07-05) @project(Make a generic deck builder)
+	- move slide converter to a new file @done(2017-07-05) @project(Create a reveal.js converter for full presentations)
+	- add commandline wrapper @done(2017-07-05) @project(Create a reveal.js converter for full presentations)
+	- make template a command line  parameter @done(2017-07-05) @project(Create a reveal.js converter for full presentations)
+	- update build scripts @done(2017-07-05) @project(Create a reveal.js converter for full presentations)
+	- convert to reveal: @done(2017-07-05) @project(Create a reveal.js converter for full presentations)
+		- open template @done(2017-07-05)
+		- read preamble @done(2017-07-05)
+		- insert converted file @done(2017-07-05)
+		- write end @done(2017-07-05)
+	- create an object with a write method that writes to target @done(2017-07-05) @project(Create a reveal.js converter for full presentations)
+		- RevealJSConverter(source, target) @done(2017-07-05)
+		- RevealJSBuilder(YAML, target) @done(2017-07-05)
 	- integrate wordpress converter from s3patterns @done(2017-07-04)
 	- integrate wordpress converter from mdtools @done(2017-07-04)
 	✔ build files for each pattern group to temp folder (add pattern number to each pattern) @done (17-07-04 22:18) @project(Updated build process)
