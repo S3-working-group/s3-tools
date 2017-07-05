@@ -1,54 +1,72 @@
+Make a generic deck builder:
+	 - read full presentation structure from yaml
+		- read name of title and end slides
+		- read introduction and closing (if present) form yaml
+		- rename patterns and groups to chapters and sections
+		- should configuration (numbering, headlines etc go to yaml?
+		- should minimal reveal.js be added to this repo?
+		- should templates also live in this repo?
+		- rename patterns to config
+		- fix cmd to build decks: add title, intro, closing and end
+	
+Create a reveal.js converter for full presentations:
+	- move slide converter to a new file @done(2017-07-05)
+	- add commandline wrapper @done(2017-07-05)
+	- make template a command line  parameter @done(2017-07-05)
+	- update build scripts
+	- 
+	- convert to reveal: @done(2017-07-05)
+		- open template @done(2017-07-05)
+		- read preamble @done(2017-07-05)
+		- insert converted file @done(2017-07-05)
+		- write end @done(2017-07-05)
+	- create an object with a write method that writes to target @done(2017-07-05)
+		- RevealJSConverter(source, target) @done(2017-07-05)
+		- RevealJSBuilder(YAML, target) @done(2017-07-05)
 Integrate with other repos:
 	s3handbook contains build code for handbook in pdf/epub/web version
 - decide what to merge from handbook, and how to do this.  It's probably a good idea to move all that stuff into one repository (mdtools?)
-- integrate wordpress converter from s3patterns @done(2017-07-04)
-- integrate wordpress converter from mdtools @done(2017-07-04)
 - integrate reveal converter from mdtools
-Updated build process:
-	✔ build files for each pattern group to temp folder (add pattern number to each pattern) @done (17-07-04 22:18)
-	✔ use these files to build deckset and wordpress and reveal.js @done (17-07-04 22:19)
-	- use these files to build reveal.js
-	✔ add configuration options to insert group text title slide, group_img_title_slide and illustrations for pattern groups @done (17-07-04 22:19)
-	- add config option to switch on/off the pattern slides @done(2017-07-04)
-	- move location of temp folder to a shared variable @done(2017-07-05)
 
-reveal.js converter:
-	- implement new converter algorithm @estimate(3hrs) @done(2017-07-05)
-	- check and fix all specific converter issues @done(2017-07-05)
-	- update reveal.js in presentation (extract styles before!!)
-	New Deckset File Converter Algorithm:
-		- read file until next slide break or EOF and identify: @done(2017-07-05)
-			- slide headline (first headline) @done(2017-07-05)
-			- (optional) image @done(2017-07-05)
-			- rest of text @done(2017-07-05)
-			- remove all duplicate line feeds along the way @done(2017-07-05)
-		- if pattern file: prefix headline with pattern number @done(2017-07-05)
-		- else: output headline @done(2017-07-05)
-		- if image @done(2017-07-05)
-			- if is background image, add to section background @done(2017-07-05)
-			- else: add text to div, and then add image to another div and float right @done(2017-07-05)
-		- else: output text @done(2017-07-05)
-	Specific converter issues:
-		Some or all issues might be gone after new algorithm is implemented
-		- converter does not add pattern numbers and patterns slides @done(2017-07-05)
-		- remove '[fit]' from headlines 
-		- images with 'fit' are background images (see https://github.com/hakimel/reveal.js#slide-backgrounds) @done(2017-07-05)
-		- text flows over the slide, especially with inline images
-		- sometimes text is truncated (e.g. in slides 'agreement', 'pattern', 'domain' from "all patterns explained") @done(2017-07-05)
-		- text does not flow properly around the sides of images and is truncated when browser is full width (e.g. in 'Evaluate Meetings': <h3></h3><p><img float right></p><p>text></p><ul></ul> or "Intended Outcome":  h3 -  p with omg - ul). Apparently <ul> (and <ol>, see "Rounds") does not float left. Simplest way to solve this might be to put all text in one div, and image in another one. @done(2017-07-05)
-		- first three slides of "all patterns explained" are broken (due to choices of headline levels etc.)
 Style/Theming:
 	see https://github.com/hakimel/reveal.js/blob/master/css/theme/README.md
-	- check configuration and presentation size
+	- paragraphs are centered, should be aligned right (.reveal .slides { text-align: center;} 
+	- some slides are truncated (affects text-only slides also). Those slides are displayed completely when reducing the screen width
+
+Archive:
+	- integrate wordpress converter from s3patterns @done(2017-07-04)
+	- integrate wordpress converter from mdtools @done(2017-07-04)
+	✔ build files for each pattern group to temp folder (add pattern number to each pattern) @done (17-07-04 22:18) @project(Updated build process)
+	✔ use these files to build deckset and wordpress and reveal.js @done (17-07-04 22:19) @project(Updated build process)
+	- use these files to build reveal.js @done(2017-07-05) @project(Updated build process)
+	✔ add configuration options to insert group text title slide, group_img_title_slide and illustrations for pattern groups @done (17-07-04 22:19) @project(Updated build process)
+	- add config option to switch on/off the pattern slides @done(2017-07-04) @project(Updated build process)
+	- move location of temp folder to a shared variable @done(2017-07-05) @project(Updated build process)
+	- implement new converter algorithm @estimate(3hrs) @done(2017-07-05) @project(reveal.js converter)
+	- check and fix all specific converter issues @done(2017-07-05) @project(reveal.js converter)
+	- update reveal.js in presentation (extract styles before!!) @done(2017-07-05) @project(reveal.js converter)
+	- read file until next slide break or EOF and identify: @done(2017-07-05) @project(reveal.js converter / New Deckset File Converter Algorithm)
+		- slide headline (first headline) @done(2017-07-05)
+		- (optional) image @done(2017-07-05)
+		- rest of text @done(2017-07-05)
+		- remove all duplicate line feeds along the way @done(2017-07-05)
+	- if pattern file: prefix headline with pattern number @done(2017-07-05) @project(reveal.js converter / New Deckset File Converter Algorithm)
+	- else: output headline @done(2017-07-05) @project(reveal.js converter / New Deckset File Converter Algorithm)
+	- if image @done(2017-07-05) @project(reveal.js converter / New Deckset File Converter Algorithm)
+		- if is background image, add to section background @done(2017-07-05)
+		- else: add text to div, and then add image to another div and float right @done(2017-07-05)
+	- else: output text @done(2017-07-05) @project(reveal.js converter / New Deckset File Converter Algorithm)
+	- converter does not add pattern numbers and patterns slides @done(2017-07-05) @project(reveal.js converter / Specific converter issues)
+	- remove '[fit]' from headlines @done(2017-07-05) @project(reveal.js converter / Specific converter issues)
+	- images with 'fit' are background images (see https://github.com/hakimel/reveal.js#slide-backgrounds) @done(2017-07-05) @project(reveal.js converter / Specific converter issues)
+	- text flows over the slide, especially with inline images @done(2017-07-05) @project(reveal.js converter / Specific converter issues)
+	- sometimes text is truncated (e.g. in slides 'agreement', 'pattern', 'domain' from "all patterns explained") @done(2017-07-05) @project(reveal.js converter / Specific converter issues)
+	- text does not flow properly around the sides of images and is truncated when browser is full width (e.g. in 'Evaluate Meetings': <h3></h3><p><img float right></p><p>text></p><ul></ul> or "Intended Outcome":  h3 -  p with omg - ul). Apparently <ul> (and <ol>, see "Rounds") does not float left. Simplest way to solve this might be to put all text in one div, and image in another one. @done(2017-07-05) @project(reveal.js converter / Specific converter issues)
+	- first three slides of "all patterns explained" are broken (due to choices of headline levels etc.) @done(2017-07-05) @project(reveal.js converter / Specific converter issues)
+	- check configuration and presentation size @done(2017-07-05) @project(Style/Theming)
 		https://github.com/hakimel/reveal.js#configuration
 		https://github.com/hakimel/reveal.js#presentation-size
-	
-	- create a new theme (and copy over existing  modifications)
-	- fix remaining style issues (below) in new theme
-	Style / Config Issues:
-		- Headline 1 is too big (and maybe headlines levels are wrong in source material)
-		- text is too big
-		- paragraphs are centered, should be aligned right (.reveal .slides { text-align: center;} 
-		- many slides are truncated (affects text-only slides also). Those slides are displayed completely when reducing the screen width
-		- some slides ??what does this mean??
-		- background images are truncated
+	- create a new theme (and copy over existing  modifications) @done(2017-07-05) @project(Style/Theming)
+	- Headline 1 is too big (and maybe headlines levels are wrong in source material) @done(2017-07-05) @project(Style/Theming / Style / Config Issues)
+	- text is too big @done(2017-07-05) @project(Style/Theming / Style / Config Issues)
+	- background images are truncated @done(2017-07-05) @project(Style/Theming / Style / Config Issues)

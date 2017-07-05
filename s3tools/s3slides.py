@@ -8,21 +8,31 @@ import os.path
 import sys
 
 from build_slides import cmd_build_slides, cmd_create_source_files_for_slides
-
+from convert_slides import cmd_convert_slides
 
 def add_parser_build(subparsers):
     sp = subparsers.add_parser('build',
-                               help="Build s3 patterns slide deck.")
+                               help="Build a slide deck.")
     sp.add_argument('format', help="presentation format, either 'deckset', 'wordpress' or 'revealjs'.")
-    sp.add_argument('patterns', help='yaml file with pattern structure')
+    sp.add_argument('config', help='yaml file with presenation structure')
     sp.add_argument('source', help='Directory with source files.')
     sp.add_argument('target', help='Target file (for reveal.js and deckset) or folder (for wordpress).')
-    sp.add_argument('--footer', help='The footer to add to each group for wordpress output')
+    sp.add_argument('--footer', help='The footer to add to each group (wordpress output)')
+    sp.add_argument('--template', help='The template to use (deckset and revealjs output)')
     sp.add_argument('--group-title', default='none',
         help='What kind of title slide to add to each pattern groups: text, img, both, none (default)')
     sp.add_argument('--add-group-illustration', action='store_true',
         help='What kind of title slide to add to each pattern groups: text, img, both, none (default)')
     sp.set_defaults(func=cmd_build_slides)
+
+
+def add_parser_convert(subparsers):
+    sp = subparsers.add_parser('convert',
+                               help="Convert slides to reveal.js")
+    sp.add_argument('source', help='Source presentation.')
+    sp.add_argument('target', help='Target file (for reveal.js and deckset) or folder (for wordpress).')
+    sp.add_argument('template', help='The template to use')
+    sp.set_defaults(func=cmd_convert_slides)
     
 
 def add_parser_skeleton(subparsers):
@@ -40,6 +50,7 @@ def main():
     parser.add_argument('--verbose', '-v', action='count')
     subparsers = parser.add_subparsers()
     add_parser_build(subparsers)
+    add_parser_convert(subparsers)
     add_parser_skeleton(subparsers)
 
     args = parser.parse_args()

@@ -6,35 +6,26 @@ Build the All Patterns Explained slide deck in reveal.js format.
 
 import codecs
 import os
-import re
-from string import Template
-import CommonMark
 
-from common import make_pathname, get_patterns
-
-#from revealjs_converter import convert_to_reveal
+from common import make_pathname
+from revealjs_converter import Slide
 
 class RevealJsWriter(object):
+    """Inject output of content_writer into a template."""
 
     CONTENT_MARKER = "<!-- INSERT-CONTENT -->"
 
-    def __init__(self, args, tmp_folder):
-        self.args = args
-        self.source = self.args.source
-        self.template_path = os.path.join(
-            os.path.dirname(self.args.target), '..', 'templates', 'revealjs-template.html')
-        self.tmp_folder = tmp_folder
-        (self.handbook_group_order, self.s3_patterns, _) = get_patterns(args.patterns)
+    def __init__(self, target_path, template_path, content_writer):
+        self.target_path = target_path
+        self.template_path = template_path
+        self.content_writer = content_writer
 
     def build(self):
-        with codecs.open(self.args.target, 'w+', 'utf-8') as self.target:
+        with codecs.open(self.target_path, 'w+', 'utf-8') as self.target:
             with codecs.open(self.template_path, 'r', 'utf-8') as self.template:
 
                 self.copy_template_header()
-                self.insert_title()
-                for group in self.handbook_group_order:
-                    self.insert_group(group)
-                self.insert_closing()
+                self.content_writer.write(self.target)
                 self.copy_template_footer()
 
     def copy_template_header(self):
@@ -47,6 +38,22 @@ class RevealJsWriter(object):
     def copy_template_footer(self):
         for line in self.template:
             self.target.write(line)
+
+
+class RevealJSBuilder(object):
+    """TODO: untested, needs some more input data."""
+
+    def __init__(self, source, chapter_order,  tmp_folder):
+        self.source = source
+        self.tmp_folder = tmp_folder
+        self.chapter_order = chapter_order
+
+    def write(self, target):
+        self.insert_title()
+        for group in self.handbook_group_order:
+            self.insert_group(group)
+            self.insert_closing()
+            self.copy_template_footer()
 
     def insert_title(self):
         self._copy_section(os.path.join(self.source, 'title.md'))
@@ -78,88 +85,3 @@ class RevealJsWriter(object):
         self._end_section()
 
 
-class Slide(object):
-
-    IMG_TEMPLATE = '![](%s)'
-    IMG_PATTERN = re.compile("\!\[(?P<format>.*)\]\((?P<url>.*)\)")
-    HEADLINE_PATTERN = re.compile("^(?P<level>#+)(?: ?(?:\[fit\])? ?)(?P<text>.*)$")
-    HEADLINE = Template("$level $text\n")
-    FLOATING_IMAGE = Template(
-        """<div class="float-right"><img src="$url" /></div>\n\n""")
-
-    class EndOfFile(Exception):
-        pass
-
-    def __init__(self):
-        self.headline = None
-        self.background_img = None
-        self.content = []
-        self.floating_image = None
-        self.is_empty = True
-
-    def read(self, source):
-        """Read source until end of slide or end of file."""
-        for line in source:
-            self.is_empty = False
-            l = line.strip()
-            if l.strip() == '---':
-                return
-            elif l.startswith('#'):
-                headline = self.process_headline(l)
-                if not self.headline:
-                    self.headline = headline
-                else:
-                    self.content.append(headline)
-            elif l.startswith("![") and l.endswith(')'):
-                #process image
-                self.process_image(l)
-            else:
-                self.content.append(line)
-        else:
-            raise self.EndOfFile()
-
-    def process_image(self, line):
-        """Identify background and floating images, add all others to content.."""
-        # TODO: convert background images (needs two pass and buffer)
-        m = self.IMG_PATTERN.match(line)
-        format, image_url = (m.group('format').lower(), m.group('url'))
-        if 'right' in format:
-            self.floating_image = image_url
-        elif format == 'fit':
-            self.background_img = image_url
-        else:
-            self.content.append('![](%s)' % image_url)
-
-    def process_headline(self, headline):
-        """Remove [fit] from headline."""
-        m = self.HEADLINE_PATTERN.match(headline)
-        return self.HEADLINE.substitute(level=m.group('level'), text=m.group('text'))
-
-    def slide_start(self, target):
-        if self.background_img:
-            target.write("""<section data-background-image="%s">\n""" % self.background_img)
-        else: 
-            target.write("<section>\n")
-
-    def slide_end(self, target):
-        target.write("</section>\n\n")
-            
-    def render(self, target):
-        if self.is_empty:
-            return
-
-        self.slide_start(target)  
-        if self.headline:
-            target.write(CommonMark.commonmark(self.headline))
-            target.write("\n")
-
-        if self.floating_image:
-            target.write("""<div class="float-left">\n""")
-            target.write(CommonMark.commonmark("".join(self.content)))
-            target.write('</div>\n')
-            target.write(self.FLOATING_IMAGE.substitute(url=self.floating_image))
-
-        else:
-            target.write(CommonMark.commonmark("".join(self.content)))
-            target.write("\n")
-        self.slide_end(target)
