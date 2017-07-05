@@ -74,9 +74,18 @@ def build_wordpress(args):
 def cmd_create_source_files_for_slides(args):
     """Create dummy source files for slides. If file or folder exists, don't touch it."""
 
-    s3_patterns = get_patterns(args.patterns)[1]
+    create_directory(args.target)
+    config = read_config(args.config)
 
-    create_directory(args.source)
+    def make_group(group_name, source):
+        # create group dir
+        group_root = os.path.join(args.target, make_pathname(group_name))
+        create_directory(group_root)
+        # create group index file
+        make_file(group_root, "index", group_name, '#')
+        # create individual sections (add section name as headline)
+        for section in source:
+            make_file(group_root, section, section, '##')
 
     def make_file(root, filename_root, title_root, markup='#'):
         """Create file if it does not exist."""
@@ -88,15 +97,14 @@ def cmd_create_source_files_for_slides(args):
             if args.verbose:
                 print "skipped %s" % title_root
 
-    for group in s3_patterns.keys():
-        # create group dir
-        group_root = os.path.join(args.source, make_pathname(group))
-        create_directory(group_root)
-        # create group index file
-        make_file(group_root, "index", group, '#')
-        # create individual patterns (add pattern name as headline)
-        for pattern in s3_patterns[group]:
-            make_file(group_root, pattern, pattern, '##')
+    make_file(args.target, 'title', 'title')
+    if config.has_key('introduction'):
+        make_group('introduction', config['introduction'])
+    for chapter in config['chapters'].keys():
+        make_group(chapter, config['chapters'][chapter])
+    if config.has_key('closing'):
+        make_group('closing', config['closing'])
+    make_file(args.target, 'end', 'end')
 
 
 class SectionCompiler():

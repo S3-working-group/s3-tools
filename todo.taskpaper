@@ -1,15 +1,16 @@
 Make a generic deck builder:
 	 - read full presentation structure from yaml
-		- should configuration (numbering, headlines etc go to yaml?
-		- should templates also live in this repo?
-		- fix skeleton writer!!
-		- add CHAPTER_NUMBER, CHAPTER_INDEX_FILENAME, CHAPTER_INDEX_IMAGE, CHAPTER_TITLE_IMAGE  to config 
-		- remove empty slide at end of each section in reveal.js
-		- add minimal reveal.js to repo
+		- should configuration (numbering, headlines etc go to yaml? - no, as they might be different for different outpu @done(2017-07-05)
+		- should templates also live in this repo? probably not @done(2017-07-05)
+		- fix skeleton writer!! @done(2017-07-05)
+		- later: add CHAPTER_NUMBER, CHAPTER_INDEX_FILENAME, CHAPTER_INDEX_IMAGE, CHAPTER_TITLE_IMAGE  to config 
+		- later: remove empty slide at end of each section in reveal.js
+		- add minimal reveal.js to repo?? no @done(2017-07-05)
 Integrate with other repos:
 	s3handbook contains build code for handbook in pdf/epub/web version
 - decide what to merge from handbook, and how to do this.  It's probably a good idea to move all that stuff into one repository (mdtools?)
-- integrate reveal converter from mdtools
+- move all slide deck code to mdtools so mdtools contains everything to build and manipulate Markdown slidedecks
+- move all code from s3 handbook into this repo so all specific code for  working with patterns is contained here
 Style/Theming:
 	see https://github.com/hakimel/reveal.js/blob/master/css/theme/README.md
 	- paragraphs are centered, should be aligned right (.reveal .slides { text-align: center;} 

@@ -39,7 +39,7 @@ def add_parser_skeleton(subparsers):
     sp = subparsers.add_parser('skeleton',
                                help="Create skeleton directories and files for slides.")
     sp.add_argument('config', help='yaml file with presentation structure')
-    sp.add_argument('source', help='Directory for source files.')
+    sp.add_argument('target', help='Target directory for skeleton files.')
     sp.set_defaults(func=cmd_create_source_files_for_slides)
 
 
